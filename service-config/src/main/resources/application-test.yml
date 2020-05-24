@@ -1,0 +1,12 @@
+server:
+  port: 8078
+
+eureka:
+  instance:
+    leaseRenewalIntervalInSeconds: 30
+  client:
+    register-with-eureka: true
+    fetch-registry: false
+    registryFetchIntervalSeconds: 30
+    serviceUrl:
+     defaultZone: http://localhost:8079/eureka

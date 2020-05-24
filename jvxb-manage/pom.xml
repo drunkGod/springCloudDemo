@@ -34,11 +34,11 @@
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
 
-        <!-- eureka配置中心客户端-->
-        <!--<dependency>-->
-        <!--<groupId>org.springframework.cloud</groupId>-->
-        <!--<artifactId>spring-cloud-config-client</artifactId>-->
-        <!--</dependency>-->
+        <!--eureka配置中心客户端-->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-config-client</artifactId>
+        </dependency>
 
         <!-- eruka客户端 -->
         <dependency>
@@ -83,6 +83,17 @@
             <artifactId>mysql-connector-java</artifactId>
             <version>${mysql-connector.version}</version>
             <scope>runtime</scope>
+        </dependency>
+
+        <!-- 监控 -->
+        <dependency>
+            <groupId>de.codecentric</groupId>
+            <artifactId>spring-boot-admin-starter-client</artifactId>
+            <version>${spring-boot-admin.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
 
     </dependencies>

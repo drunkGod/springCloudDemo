@@ -13,8 +13,6 @@ import com.jvxb.modules.livable.service.remoteservice.VoteService;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -39,8 +37,6 @@ import java.util.Map;
 @RestController
 @RequestMapping("/beauty")
 public class BeautyController {
-
-    Logger logger = LoggerFactory.getLogger(getClass());
 
     @Autowired
     private BeautyService beautyService;

@@ -1,0 +1,21 @@
+spring:
+  application:
+    name: service-monitor
+  profiles:
+    active: dev
+
+eureka:
+  instance:
+      # 客户端到服务端的心跳频率（默认30秒）
+      leaseRenewalIntervalInSeconds: 10
+      health-check-url-path: /actuator/health
+      prefer-ip-address: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: ALWAYS

@@ -1,16 +1,17 @@
-package com.jvxb.livable.servicecenter;
+package com.jvxb.livable.servicemonitor;
 
+import de.codecentric.boot.admin.server.config.EnableAdminServer;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
-import org.springframework.cloud.netflix.eureka.server.EnableEurekaServer;
 
 @SpringBootApplication
-@EnableEurekaServer
-public class ServiceCenterApplication {
+@EnableDiscoveryClient
+@EnableAdminServer
+public class ServiceMonitorApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(ServiceCenterApplication.class, args);
+        SpringApplication.run(ServiceMonitorApplication.class, args);
     }
 
 }
