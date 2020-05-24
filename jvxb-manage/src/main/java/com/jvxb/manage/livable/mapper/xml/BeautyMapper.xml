@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jvxb.manage.livable.mapper.BeautyMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.jvxb.manage.livable.entity.Beauty">
+        <id column="id" property="id" />
+        <result column="name" property="name" />
+        <result column="img" property="img" />
+        <result column="ps" property="ps" />
+        <result column="origin" property="origin" />
+        <result column="createtime" property="createtime" />
+        <result column="updatetime" property="updatetime" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, name, img, ps, origin, createtime, updatetime
+    </sql>
+
+</mapper>

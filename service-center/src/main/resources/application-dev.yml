@@ -1,0 +1,11 @@
+server:
+  port: 8200
+
+eureka:
+  instance:
+    hostname: 127.0.0.1
+  client:
+    fetch-registry: false
+    register-with-eureka: false
+    serviceUrl:
+      defaultZone: http://localhost:${server.port}/eureka/

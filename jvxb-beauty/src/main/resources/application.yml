@@ -1,0 +1,5 @@
+spring:
+  application:
+    name: jvxb-beauty
+  profiles:
+    active: dev

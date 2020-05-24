@@ -1,0 +1,37 @@
+server:
+  port: 8081
+
+spring:
+  datasource:
+    bg:
+      driver-class-name: com.mysql.jdbc.Driver
+      jdbc-url: jdbc:mysql://127.0.0.1:3306/bg_manage?useUnicode=true&serverTimezone=GMT%2B8&characterEncoding=utf8&useSSL=false
+      username: root
+      password: 123456
+  redis:
+    database: 1
+    host: 127.0.0.1
+    password:
+    port: 6379
+    timeout: 5000ms       # 连接超时时间 单位 ms（毫秒）
+#    cluster:
+#      nodes: 10.3.1.4:7000,10.3.1.4:7001,...,10.3.1.4:7008
+    lettuce:
+      pool:
+        max-active: 8  # 连接池最大连接数（使用负值表示没有限制） 默认
+        max-wait: -1ms  # 连接池最大阻塞等待时间（使用负值表示没有限制） 默认 -1
+        max-idle: 8  # 连接池中的最大空闲连接 默认 8
+        min-idle: 0  # 连接池中的最小空闲连接 默认 0
+  rabbitmq:
+    host: 47.112.148.36
+    port: 5672
+    username: test
+    password: test
+    #rbbitmq虚拟主机路径默认为/,其它主机需配置权限
+    virtual-host: test
+    publisher-confirms: true  #发送确认,默认是false
+    listener:
+      simple:
+        acknowledge-mode: manual #消费手动确认，默认是auto
+        #max-concurrency: 10 #最大并发
+        #prefetch: 1 #限流
