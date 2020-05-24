@@ -1,0 +1,7 @@
+spring:
+  datasource:
+    bg:
+      driver-class-name: com.mysql.jdbc.Driver
+      jdbc-url: jdbc:mysql://localhost:3306/bg_manage?useUnicode=true&serverTimezone=UTC&characterEncoding=utf8&useSSL=false
+      username: root
+      password: 123456
