@@ -5,11 +5,15 @@ import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.toolkit.StringUtils;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.jvxb.common.web.RespMsg;
 import com.jvxb.beauty.livable.entity.Beauty;
 import com.jvxb.beauty.livable.service.BeautyService;
 import com.jvxb.modules.utils.NetUtil;
 import com.jvxb.modules.livable.service.remoteservice.VoteService;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
@@ -18,6 +22,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
@@ -36,6 +41,7 @@ import java.util.Map;
  */
 @RestController
 @RequestMapping("/beauty")
+@Api(tags = "美女")
 public class BeautyController {
 
     @Autowired
@@ -44,6 +50,25 @@ public class BeautyController {
     private RedisTemplate redisTemplate;
     @Autowired
     private VoteService voteService;
+
+    @GetMapping("listPage")
+    @ApiOperation("测试列表（分页）")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "name", value = "姓名", required = false, dataType = "String"),
+            @ApiImplicitParam(name = "size", value = "每页条数，默认10条", dataType = "Integer", required = false),
+            @ApiImplicitParam(name = "current", value = "第几页,默认第一页", dataType = "Integer", required = false)
+    })
+    public Object listPage(@RequestParam String name,
+                           @RequestParam(defaultValue = "10") Integer size,
+                           @RequestParam(defaultValue = "1") Integer current) {
+        IPage<Beauty> beautyIPage = new Page<>(current, size);
+        QueryWrapper wrapper = new QueryWrapper();
+        wrapper.like(StringUtils.isNotEmpty(name), Beauty.NAME, name);
+        wrapper.orderByDesc(Beauty.PS);
+        beautyService.page(beautyIPage, wrapper);
+        return RespMsg.ok(beautyIPage);
+    }
+
 
     @GetMapping("list")
     @ApiOperation("测试列表（全量）")
@@ -57,6 +82,7 @@ public class BeautyController {
         List<Beauty> list = beautyService.list(wrapper);
         return RespMsg.ok(list);
     }
+
 
     /**
      * 根据投票id，使其票数+1

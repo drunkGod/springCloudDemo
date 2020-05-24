@@ -1,16 +1,6 @@
 server:
   port: 8080
 
-eureka:
-  instance:
-    # 客户端到服务端的心跳频率（默认30秒）
-    leaseRenewalIntervalInSeconds: 30
-  client:
-    # 拉取服务注册信息间隔（默认30秒）
-    registryFetchIntervalSeconds: 30
-    service-url:
-      defaultZone : http://localhost:8079/eureka
-
 spring:
   datasource:
     bg:
@@ -34,5 +24,5 @@ spring:
         min-idle: 0  # 连接池中的最小空闲连接 默认 0
 
 logging:
-  config: classpath:logback-dev.xml
+  config: classpath:logback-test.xml
 

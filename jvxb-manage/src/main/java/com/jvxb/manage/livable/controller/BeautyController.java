@@ -49,7 +49,7 @@ public class BeautyController {
             @ApiImplicitParam(name = "size", value = "每页条数，默认10条", dataType = "Integer", required = false),
             @ApiImplicitParam(name = "current", value = "第几页,默认第一页", dataType = "Integer", required = false)
     })
-    public Object listPage(@RequestParam String name,
+    public Object listPage(String name,
                            @RequestParam(defaultValue = "10") Integer size,
                            @RequestParam(defaultValue = "1") Integer current) {
         IPage<Beauty> beautyIPage = new Page<>(current, size);

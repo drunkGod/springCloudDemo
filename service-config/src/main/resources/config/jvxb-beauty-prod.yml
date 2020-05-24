@@ -1,16 +1,6 @@
 server:
   port: 8081
 
-eureka:
-  instance:
-    # 客户端到服务端的心跳频率（默认30秒）
-    leaseRenewalIntervalInSeconds: 30
-  client:
-    # 拉取服务注册信息间隔（默认30秒）
-    registryFetchIntervalSeconds: 30
-    service-url:
-      defaultZone : http://localhost:8079/eureka
-
 spring:
   datasource:
     bg:
@@ -44,3 +34,6 @@ spring:
         acknowledge-mode: manual #手动接受数据
         #max-concurrency: 10 #最大并发
         #prefetch: 1 #限流
+
+logging:
+  config: classpath:logback-prod.xml

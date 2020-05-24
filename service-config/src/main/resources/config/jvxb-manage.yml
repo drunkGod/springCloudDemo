@@ -4,7 +4,6 @@ spring:
   profiles:
     active: dev
 
-
 eureka:
   instance:
     health-check-url-path: /actuator/health   #应用实例的相对运行状况检查URL路径默认为 /info/health

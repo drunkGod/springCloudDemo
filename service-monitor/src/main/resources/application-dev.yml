@@ -1,9 +1,22 @@
 server:
-  port: 8077
+  port: 8076
+
+spring:
+  security:
+    user:
+      name: "dev"
+      password: "dev"
 
 eureka:
+  instance:
+    metadata-map:
+      user.name: ${spring.security.user.name}
+      user.password: ${spring.security.user.password}
   client:
     # 拉取服务注册信息间隔（默认30秒）
     registryFetchIntervalSeconds: 10
     service-url:
-      defaultZone : http://127.0.0.1:8079/eureka
+      defaultZone : http://dev:dev@localhost:8079/eureka/
+
+logging:
+  config: classpath:logback-dev.xml

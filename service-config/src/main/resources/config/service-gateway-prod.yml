@@ -1,0 +1,12 @@
+server:
+  port: 8077
+
+eureka:
+  client:
+    # 拉取服务注册信息间隔（默认30秒）
+    registryFetchIntervalSeconds: 30
+    service-url:
+      defaultZone : http://prod:prod@localhost:8079/eureka/
+
+logging:
+  config: classpath:logback-prod.xml

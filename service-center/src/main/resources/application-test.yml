@@ -1,13 +1,20 @@
 server:
   port: 8079
 
+spring:
+  security:
+    user:
+      name: test
+      password: test
+
 eureka:
-  instance:
-    hostname: localhost
   client:
     # 是否获取注册信息
     fetch-registry: false
     # 是否注册到eureka
     register-with-eureka: false
     serviceUrl:
-      defaultZone: http://${eureka.instance.hostname}:${server.port}/eureka/
+      defaultZone: http://test:test@localhost:${server.port}/eureka/
+
+logging:
+  config: classpath:logback-test.xml

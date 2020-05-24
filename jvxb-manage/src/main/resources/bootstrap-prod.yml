@@ -1,7 +1,14 @@
+spring:
+  cloud:
+    config:
+      profile: prod
+
 eureka:
   instance:
+    # 客户端到服务端的心跳频率（默认30秒）
     leaseRenewalIntervalInSeconds: 30
-    prefer-ip-address: true #以IP地址注册到服务中心，相互注册使用IP地址
   client:
+    # 拉取服务注册信息间隔（默认30秒）
+    registryFetchIntervalSeconds: 30
     service-url:
-      defaultZone : http://localhost:8079/eureka
+      defaultZone : http://prod:prod@localhost:8079/eureka/

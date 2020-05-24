@@ -9,5 +9,7 @@ eureka:
     fetch-registry: false
     registryFetchIntervalSeconds: 30
     serviceUrl:
-     defaultZone: http://localhost:8079/eureka
+     defaultZone: http://dev:dev@localhost:8079/eureka/
 
+logging:
+  config: classpath:logback-dev.xml

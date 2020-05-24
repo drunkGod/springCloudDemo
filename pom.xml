@@ -21,6 +21,7 @@
         <module>modules</module>
         <module>service-center</module>
         <module>service-config</module>
+        <module>service-gateway</module>
         <module>service-monitor</module>
         <module>jvxb-beauty</module>
         <module>jvxb-manage</module>
