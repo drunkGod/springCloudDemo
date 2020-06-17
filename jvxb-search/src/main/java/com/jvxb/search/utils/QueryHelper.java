@@ -1,6 +1,7 @@
 package com.jvxb.search.utils;
 
 import com.jvxb.common.utils.Cu;
+import com.jvxb.common.utils.EsKeyword;
 import com.jvxb.search.configuration.exception.EsSearchException;
 import com.jvxb.search.livable.entity.SearchResult;
 import org.elasticsearch.action.search.SearchRequestBuilder;
@@ -26,6 +27,7 @@ import java.util.*;
 public class QueryHelper {
 
     private static final Logger logger = LoggerFactory.getLogger(QueryHelper.class);
+    public static final String COMMA = ",";
 
     /**
      * - 字段（field），对应内容有：eq(ual)（等于）、ne（不等于）、like（近似）等，
@@ -58,18 +60,18 @@ public class QueryHelper {
                 continue;
             }
             //根据查询条件分类组装。
-            if (type.equalsIgnoreCase(QueryConstants.FIELD)) {
+            if (type.equalsIgnoreCase(EsKeyword.FIELD.getKeyword())) {
                 resolveQueryField(boolQueryBuilder, value);
-            } else if (type.equalsIgnoreCase(QueryConstants.HIGHTLIGHT)) {
+            } else if (type.equalsIgnoreCase(EsKeyword.HIGHTLIGHT.getKeyword())) {
                 resolveQueryHightlight(boolQueryBuilder, value);
-            } else if (type.equalsIgnoreCase(QueryConstants.RANGE)) {
+            } else if (type.equalsIgnoreCase(EsKeyword.RANGE.getKeyword())) {
                 resolveQueryRange(searchRequestBuilder, value);
-            } else if (type.equalsIgnoreCase(QueryConstants.PAGE)) {
+            } else if (type.equalsIgnoreCase(EsKeyword.LIMIT.getKeyword())) {
                 resolveQueryPage(searchRequestBuilder, value);
                 setSearchResultPage(searchResult, value);
-            } else if (type.equalsIgnoreCase(QueryConstants.SORT)) {
+            } else if (type.equalsIgnoreCase(EsKeyword.SORT.getKeyword())) {
                 resolveQuerySort(searchRequestBuilder, value);
-            } else if (type.equalsIgnoreCase(QueryConstants.FETCH) || type.equalsIgnoreCase(QueryConstants.FETCHSOURCE)) {
+            } else if (type.equalsIgnoreCase(EsKeyword.FETCH.getKeyword())) {
                 resolveQueryFetchSource(searchRequestBuilder, value);
             }
         }
@@ -84,8 +86,8 @@ public class QueryHelper {
             String[] includes = Cu.convert2StrTrimArr(value);
             searchRequestBuilder.setFetchSource(includes, null);
         } else if (value instanceof Map) {
-            Object includeValue = ((Map) value).get(QueryConstants.FETCH_INCLUDES);
-            Object excludeValue = ((Map) value).get(QueryConstants.FETCH_EXCLUDES);
+            Object includeValue = ((Map) value).get(EsKeyword.FETCH_INCLUDES);
+            Object excludeValue = ((Map) value).get(EsKeyword.FETCH_EXCLUDES);
             String[] includes = Cu.convert2StrTrimArr(includeValue);
             String[] excludes = Cu.convert2StrTrimArr(excludeValue);
             searchRequestBuilder.setFetchSource(includes, excludes);
@@ -95,8 +97,8 @@ public class QueryHelper {
     private static void resolveQueryPage(SearchRequestBuilder searchRequestBuilder, Object value) {
         //处理分页 "page": "1,10"
         Optional.ofNullable(value).map(p -> p.toString()).ifPresent(e -> {
-            int pageNum = Integer.valueOf(e.split(QueryConstants.COMMA)[0]);
-            int pageSize = Integer.valueOf(e.split(QueryConstants.COMMA)[1]);
+            int pageNum = Integer.valueOf(e.split(COMMA)[0]);
+            int pageSize = Integer.valueOf(e.split(COMMA)[1]);
             searchRequestBuilder.setFrom(pageNum - 1).setSize(pageSize);
         });
     }
@@ -124,21 +126,21 @@ public class QueryHelper {
             String handleStr = entry.getValue().trim();
             String handle = handleStr.split("\\s+", 2)[0];
             String fieldValue = handleStr.split("\\s+", 2)[1];
-            if (handle.equalsIgnoreCase(QueryConstants.BETWEEN)||handle.equalsIgnoreCase(QueryConstants.BETWEEN_TT)) {
-                requestBuilder.setQuery(QueryBuilders.rangeQuery(field).from(fieldValue.split(QueryConstants.COMMA)[0]).to(fieldValue.split(QueryConstants.COMMA)[1]));
-            } else if (handle.equalsIgnoreCase(QueryConstants.BETWEEN_FF)) {
-                requestBuilder.setQuery(QueryBuilders.rangeQuery(field).from(fieldValue.split(QueryConstants.COMMA)[0], false).to(fieldValue.split(QueryConstants.COMMA)[1], false));
-            } else if (handle.equalsIgnoreCase(QueryConstants.BETWEEN_FT)) {
-                requestBuilder.setQuery(QueryBuilders.rangeQuery(field).from(fieldValue.split(QueryConstants.COMMA)[0], false).to(fieldValue.split(QueryConstants.COMMA)[1]));
-            } else if (handle.equalsIgnoreCase(QueryConstants.BETWEEN_TF)) {
-                requestBuilder.setQuery(QueryBuilders.rangeQuery(field).from(fieldValue.split(QueryConstants.COMMA)[0]).to(fieldValue.split(QueryConstants.COMMA)[1], false));
-            } else if (handle.equalsIgnoreCase(QueryConstants.RANGE_LT)) {
+            if (handle.equalsIgnoreCase(EsKeyword.RANGE_BETWEEN.getKeyword())) {
+                requestBuilder.setQuery(QueryBuilders.rangeQuery(field).from(fieldValue.split(COMMA)[0]).to(fieldValue.split(COMMA)[1]));
+            } else if (handle.equalsIgnoreCase(EsKeyword.RANGE_BETWEEN_FF.getKeyword())) {
+                requestBuilder.setQuery(QueryBuilders.rangeQuery(field).from(fieldValue.split(COMMA)[0], false).to(fieldValue.split(COMMA)[1], false));
+            } else if (handle.equalsIgnoreCase(EsKeyword.RANGE_BETWEEN_FT.getKeyword())) {
+                requestBuilder.setQuery(QueryBuilders.rangeQuery(field).from(fieldValue.split(COMMA)[0], false).to(fieldValue.split(COMMA)[1]));
+            } else if (handle.equalsIgnoreCase(EsKeyword.RANGE_BETWEEN_TF.getKeyword())) {
+                requestBuilder.setQuery(QueryBuilders.rangeQuery(field).from(fieldValue.split(COMMA)[0]).to(fieldValue.split(COMMA)[1], false));
+            } else if (handle.equalsIgnoreCase(EsKeyword.RANGE_LT.getKeyword())) {
                 requestBuilder.setQuery(QueryBuilders.rangeQuery(field).lt(fieldValue));
-            } else if (handle.equalsIgnoreCase(QueryConstants.RANGE_LTE)) {
+            } else if (handle.equalsIgnoreCase(EsKeyword.RANGE_LTE.getKeyword())) {
                 requestBuilder.setQuery(QueryBuilders.rangeQuery(field).lte(fieldValue));
-            } else if (handle.equalsIgnoreCase(QueryConstants.RANGE_GT)) {
+            } else if (handle.equalsIgnoreCase(EsKeyword.RANGE_GT.getKeyword())) {
                 requestBuilder.setQuery(QueryBuilders.rangeQuery(field).gt(fieldValue));
-            } else if (handle.equalsIgnoreCase(QueryConstants.RANGE_GTE)) {
+            } else if (handle.equalsIgnoreCase(EsKeyword.RANGE_GTE.getKeyword())) {
                 requestBuilder.setQuery(QueryBuilders.rangeQuery(field).gte(fieldValue));
             }
         }
@@ -160,13 +162,13 @@ public class QueryHelper {
                 String handleStr = entry.getValue().toString().trim();
                 String handle = handleStr.split("\\s+", 2)[0];
                 String fieldValue = handleStr.split("\\s+", 2)[1];
-                if (handle.equalsIgnoreCase(QueryConstants.FIELD_EQUAL) || handle.equalsIgnoreCase(QueryConstants.FIELD_EQ)) {
-                    boolQueryBuilder.filter(!field.contains(QueryConstants.COMMA) ? QueryBuilders.termQuery(field, fieldValue)
-                            : QueryBuilders.multiMatchQuery(fieldValue, Cu.convert2StrTrimArr(field.split(QueryConstants.COMMA))));
-                } else if (handle.equalsIgnoreCase(QueryConstants.FIELD_NE)) {
+                if (handle.equalsIgnoreCase(EsKeyword.FIELD_EQ.getKeyword())) {
+                    boolQueryBuilder.filter(!field.contains(COMMA) ? QueryBuilders.termQuery(field, fieldValue)
+                            : QueryBuilders.multiMatchQuery(fieldValue, Cu.convert2StrTrimArr(field.split(COMMA))));
+                } else if (handle.equalsIgnoreCase(EsKeyword.FIELD_NE.getKeyword())) {
                     boolQueryBuilder.mustNot(QueryBuilders.termQuery(field, fieldValue));
-                } else if (handle.equalsIgnoreCase(QueryConstants.FIELD_LIKE)) {
-                    String[] fields = Cu.convert2StrTrimArr(field.split(QueryConstants.COMMA));
+                } else if (handle.equalsIgnoreCase(EsKeyword.FIELD_LIKE.getKeyword())) {
+                    String[] fields = Cu.convert2StrTrimArr(field.split(COMMA));
                     Arrays.stream(fields).forEach(f -> boolQueryBuilder.filter(QueryBuilders.wildcardQuery(f, String.format("*%s*", fieldValue))));
                 }
             } catch (Exception e) {
@@ -243,18 +245,18 @@ public class QueryHelper {
                 continue;
             }
             //根据查询条件分类组装。
-            if (type.equalsIgnoreCase(QueryConstants.FIELD)) {
+            if (type.equalsIgnoreCase(EsKeyword.FIELD.getKeyword())) {
                 resolveQueryField(boolQueryBuilder, value);
-            } else if (type.equalsIgnoreCase(QueryConstants.HIGHTLIGHT)) {
+            } else if (type.equalsIgnoreCase(EsKeyword.HIGHTLIGHT.getKeyword())) {
                 resolveQueryHightlight(boolQueryBuilder, value);
-            } else if (type.equalsIgnoreCase(QueryConstants.RANGE)) {
+            } else if (type.equalsIgnoreCase(EsKeyword.RANGE.getKeyword())) {
                 resolveHighLevelQueryRange(sourceBuilder, value);
-            } else if (type.equalsIgnoreCase(QueryConstants.PAGE)) {
+            } else if (type.equalsIgnoreCase(EsKeyword.LIMIT.getKeyword())) {
                 resolveHighLevelQueryPage(sourceBuilder, value);
                 setSearchResultPage(searchResult, value);
-            } else if (type.equalsIgnoreCase(QueryConstants.SORT)) {
+            } else if (type.equalsIgnoreCase(EsKeyword.SORT.getKeyword())) {
                 resolveHighLevelQuerySort(sourceBuilder, value);
-            } else if (type.equalsIgnoreCase(QueryConstants.FETCH) || type.equalsIgnoreCase(QueryConstants.FETCHSOURCE)) {
+            } else if (type.equalsIgnoreCase(EsKeyword.FETCH.getKeyword())) {
                 resolveHighLevelQueryFetchSource(sourceBuilder, value);
             }
         }
@@ -263,16 +265,16 @@ public class QueryHelper {
     private static void setSearchResultPage(SearchResult searchResult, Object value) {
         //处理分页 "page": "1,10"
         Optional.ofNullable(value).map(p -> p.toString()).ifPresent(e -> {
-            int pageNum = Integer.valueOf(e.split(QueryConstants.COMMA)[0]);
-            int pageSize = Integer.valueOf(e.split(QueryConstants.COMMA)[1]);
+            int pageNum = Integer.valueOf(e.split(COMMA)[0]);
+            int pageSize = Integer.valueOf(e.split(COMMA)[1]);
             searchResult.setPageNum(pageNum);
             searchResult.setPageSize(pageSize);
         });
     }
 
     private static void resolveHighLevelQueryFetchSource(SearchSourceBuilder sourceBuilder, Object value) {
-        Object includeValue = ((Map) value).get(QueryConstants.FETCH_INCLUDES);
-        Object excludeValue = ((Map) value).get(QueryConstants.FETCH_EXCLUDES);
+        Object includeValue = ((Map) value).get(EsKeyword.FETCH_INCLUDES);
+        Object excludeValue = ((Map) value).get(EsKeyword.FETCH_EXCLUDES);
         String[] includes = Cu.convert2StrTrimArr(includeValue);
         String[] excludes = Cu.convert2StrTrimArr(excludeValue);
         sourceBuilder.fetchSource(includes, excludes);
@@ -290,8 +292,8 @@ public class QueryHelper {
     private static void resolveHighLevelQueryPage(SearchSourceBuilder sourceBuilder, Object value) {
         //处理分页 "page": "1,10"
         Optional.ofNullable(value).map(p -> p.toString()).ifPresent(e -> {
-            int pageNum = Integer.valueOf(e.split(QueryConstants.COMMA)[0]);
-            int pageSize = Integer.valueOf(e.split(QueryConstants.COMMA)[1]);
+            int pageNum = Integer.valueOf(e.split(COMMA)[0]);
+            int pageSize = Integer.valueOf(e.split(COMMA)[1]);
             sourceBuilder.from(pageNum - 1).size(pageSize);
         });
     }
@@ -305,21 +307,21 @@ public class QueryHelper {
             String handleStr = entry.getValue().trim();
             String handle = handleStr.split("\\s+", 2)[0];
             String fieldValue = handleStr.split("\\s+", 2)[1];
-            if (handle.equalsIgnoreCase(QueryConstants.BETWEEN)) {
-                sourceBuilder.query(QueryBuilders.rangeQuery(field).from(fieldValue.split(QueryConstants.COMMA)[0]).to(fieldValue.split(QueryConstants.COMMA)[1]));
-            } else if (handle.equalsIgnoreCase(QueryConstants.BETWEEN_FF)) {
-                sourceBuilder.query(QueryBuilders.rangeQuery(field).from(fieldValue.split(QueryConstants.COMMA)[0], false).to(fieldValue.split(QueryConstants.COMMA)[1], false));
-            } else if (handle.equalsIgnoreCase(QueryConstants.BETWEEN_FT)) {
-                sourceBuilder.query(QueryBuilders.rangeQuery(field).from(fieldValue.split(QueryConstants.COMMA)[0], false).to(fieldValue.split(QueryConstants.COMMA)[1]));
-            } else if (handle.equalsIgnoreCase(QueryConstants.BETWEEN_TF)) {
-                sourceBuilder.query(QueryBuilders.rangeQuery(field).from(fieldValue.split(QueryConstants.COMMA)[0]).to(fieldValue.split(QueryConstants.COMMA)[1], false));
-            } else if (handle.equalsIgnoreCase(QueryConstants.RANGE_LT)) {
+            if (handle.equalsIgnoreCase(EsKeyword.RANGE_BETWEEN.getKeyword())) {
+                sourceBuilder.query(QueryBuilders.rangeQuery(field).from(fieldValue.split(COMMA)[0]).to(fieldValue.split(COMMA)[1]));
+            } else if (handle.equalsIgnoreCase(EsKeyword.RANGE_BETWEEN_FF.getKeyword())) {
+                sourceBuilder.query(QueryBuilders.rangeQuery(field).from(fieldValue.split(COMMA)[0], false).to(fieldValue.split(COMMA)[1], false));
+            } else if (handle.equalsIgnoreCase(EsKeyword.RANGE_BETWEEN_FT.getKeyword())) {
+                sourceBuilder.query(QueryBuilders.rangeQuery(field).from(fieldValue.split(COMMA)[0], false).to(fieldValue.split(COMMA)[1]));
+            } else if (handle.equalsIgnoreCase(EsKeyword.RANGE_BETWEEN_TF.getKeyword())) {
+                sourceBuilder.query(QueryBuilders.rangeQuery(field).from(fieldValue.split(COMMA)[0]).to(fieldValue.split(COMMA)[1], false));
+            } else if (handle.equalsIgnoreCase(EsKeyword.RANGE_LT.getKeyword())) {
                 sourceBuilder.query(QueryBuilders.rangeQuery(field).lt(fieldValue));
-            } else if (handle.equalsIgnoreCase(QueryConstants.RANGE_LTE)) {
+            } else if (handle.equalsIgnoreCase(EsKeyword.RANGE_LTE.getKeyword())) {
                 sourceBuilder.query(QueryBuilders.rangeQuery(field).lte(fieldValue));
-            } else if (handle.equalsIgnoreCase(QueryConstants.RANGE_GT)) {
+            } else if (handle.equalsIgnoreCase(EsKeyword.RANGE_GT.getKeyword())) {
                 sourceBuilder.query(QueryBuilders.rangeQuery(field).gt(fieldValue));
-            } else if (handle.equalsIgnoreCase(QueryConstants.RANGE_GTE)) {
+            } else if (handle.equalsIgnoreCase(EsKeyword.RANGE_GTE.getKeyword())) {
                 sourceBuilder.query(QueryBuilders.rangeQuery(field).gte(fieldValue));
             }
         }

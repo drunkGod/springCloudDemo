@@ -72,7 +72,7 @@ public class GeneralSearchController {
      * "range": {"field1": "between v1,v2", "field2": “lte v2”, "field3": "gt v3"},
      * "sort": {"field1": “desc”, "field2": "asc"},
      * “hightLight”: null,
-     * "page": "1,10"
+     * "limit": "1,10"
      * "fetch": "id,name"，或者{"includes": ["id","name"], "excludes": null}、{"includes": null, "excludes": ["id","name"]}
      * }
      * @return
