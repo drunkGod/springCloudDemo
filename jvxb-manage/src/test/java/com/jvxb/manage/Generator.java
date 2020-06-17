@@ -17,11 +17,11 @@ import java.io.IOException;
  */
 public class Generator {
 
-    private static final String OUTPUT_DIR = "D:\\workspace-fbs\\microservice\\jvxb-manage\\src\\main\\java";
+    private static final String OUTPUT_DIR = "D:\\一般资料\\7.gitee\\springcloudDemo\\jvxb-manage\\src\\main\\java";
     private static final String PACKAGE_NAME = "com.jvxb.manage.livable";
     private static final String AUTHOR = "jvxb";
 
-    private static final String DB_URL = "jdbc:mysql://localhost:3306/bg_manage?useUnicode=true&serverTimezone=UTC&characterEncoding=utf8&useSSL=false";
+    private static final String DB_URL = "jdbc:mysql://localhost:3306/manage?useUnicode=true&serverTimezone=UTC&characterEncoding=utf8&useSSL=false";
     private static final String DB_DRIVER = "com.mysql.jdbc.Driver";
     private static final String DB_USER_NAME = "root";
     private static final String DB_PASSWORD = "123456";
@@ -37,7 +37,7 @@ public class Generator {
     public static void main(String[] args) {
         //auth -> UserService, 设置成true: auth -> IUserService
         boolean serviceNameStartWithI = false;
-        generateByTables(serviceNameStartWithI, "user","beauty");
+        generateByTables(serviceNameStartWithI, "sys_log", "sys_permission", "sys_role", "sys_role_perm", "sys_user");
     }
 
     /**

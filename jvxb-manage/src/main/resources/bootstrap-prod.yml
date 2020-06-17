@@ -12,3 +12,28 @@ eureka:
     registryFetchIntervalSeconds: 30
     service-url:
       defaultZone : http://prod:prod@localhost:8079/eureka/
+
+feign:
+  hystrix:
+    enabled: true
+  httpclient:
+    enabled: false
+  okhttp:
+    enabled: true
+
+ribbon:
+  ConnectTimeout: 2000
+  ReadTimeout: 6000
+  MaxAutoRetries: 1   #最大重试次数，当Eureka中可以找到服务，但是服务连不上时将会重试
+  MaxAutoRetriesNextServer: 1   #切换实例的重试次数
+  OkToRetryOnAllOperations: false # 对所有的操作请求都进行重试。
+
+hystrix:
+  command:
+    default:
+      execution:
+        timeout:
+          enabled: true
+        isolation:
+          thread:
+            timeoutInMilliseconds: 25000

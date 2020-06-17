@@ -1,0 +1,13 @@
+server:
+  port: 8082
+
+spring:
+  data:
+    elasticsearch:
+      cluster-name: elasticsearch
+      cluster-nodes: 47.112.148.36:9300
+
+management:
+  health:
+    elasticsearch:
+      enabled: false

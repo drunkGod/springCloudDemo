@@ -1,7 +1,7 @@
 package com.jvxb.manage.livable.service.impl;
 
 import com.jvxb.manage.livable.entity.Beauty;
-import com.jvxb.manage.livable.mapper.BeautyMapper;
+import com.jvxb.manage.remote.mapper.BeautyMapper;
 import com.jvxb.manage.livable.service.BeautyService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.slf4j.Logger;
@@ -20,7 +20,6 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class BeautyServiceImpl extends ServiceImpl<BeautyMapper, Beauty> implements BeautyService {
-    Logger logger = LoggerFactory.getLogger(getClass());
 
     @Override
     @Cacheable(value = "user", key = "#id")

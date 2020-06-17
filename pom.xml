@@ -25,6 +25,7 @@
         <module>service-monitor</module>
         <module>jvxb-beauty</module>
         <module>jvxb-manage</module>
+        <module>jvxb-search</module>
     </modules>
 
     <properties>

@@ -1,6 +1,0 @@
-spring:
-  application:
-    name: jvxb-manage
-  profiles:
-    active: dev
-

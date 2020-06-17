@@ -1,7 +1,7 @@
 package com.jvxb.beauty.livable.service.impl;
 
-import com.jvxb.beauty.configuration.config.rabbitmq.VoteSender;
-import com.jvxb.modules.livable.service.remoteservice.VoteService;
+import com.jvxb.beauty.configuration.rabbitmq.rabbitmq.VoteSender;
+import com.jvxb.beauty.livable.service.VoteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

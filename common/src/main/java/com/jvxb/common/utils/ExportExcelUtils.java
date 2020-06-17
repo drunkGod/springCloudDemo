@@ -1,6 +1,6 @@
 package com.jvxb.common.utils;
 
-import com.jvxb.common.exception.ServiceException;
+import lombok.extern.slf4j.Slf4j;
 import net.sf.jxls.transformer.XLSTransformer;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.slf4j.Logger;
@@ -16,9 +16,8 @@ import java.util.Map;
  * Excel导出的公共方法
  *@date 2016年12月2日 上午9:33:04
  */
+@Slf4j
 public class ExportExcelUtils {
-
-	private static final Logger LOG = LoggerFactory.getLogger(ExportExcelUtils.class);
 
 	public static void excprtStudentExcel(Map beans,String srcPath,OutputStream os){
 		XLSTransformer transformer = new XLSTransformer();
@@ -30,17 +29,17 @@ public class ExportExcelUtils {
 			//将workbook中的内容用输出流写出去
 			workbook.write(os);
 		}catch (Exception e) {
-			if(LOG.isDebugEnabled()){
-				LOG.debug(e.getMessage());
+			if(log.isDebugEnabled()){
+				log.debug(e.getMessage());
 			}
-			throw new ServiceException("excel导出异常："+e.getMessage());
+			throw new RuntimeException("excel导出异常："+e.getMessage());
 		}finally{
 			if(os!=null){
 				try {
 					os.close();
 				} catch (IOException e) {
-					if(LOG.isDebugEnabled()){
-						LOG.debug(e.getMessage());
+					if(log.isDebugEnabled()){
+						log.debug(e.getMessage());
 					}
 				}
 			}

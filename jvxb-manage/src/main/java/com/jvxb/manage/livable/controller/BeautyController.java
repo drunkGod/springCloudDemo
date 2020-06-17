@@ -1,16 +1,19 @@
 package com.jvxb.manage.livable.controller;
 
-import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.jvxb.common.base.entity.es.EsDocument;
+import com.jvxb.common.utils.BeanUtil;
+import com.jvxb.common.utils.Cu;
 import com.jvxb.common.web.RespMsg;
 import com.jvxb.manage.livable.entity.Beauty;
 import com.jvxb.manage.livable.service.BeautyService;
-import com.jvxb.manage.remoteservice.RemoteVoteService;
-import com.jvxb.modules.utils.NetUtil;
+
+import com.jvxb.manage.remote.service.RemoteVoteService;
+import com.jvxb.manage.remote.service.SearchService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -21,8 +24,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * <p>
@@ -41,6 +42,8 @@ public class BeautyController {
     private BeautyService beautyService;
     @Autowired
     private RemoteVoteService remoteVoteService;
+    @Autowired
+    private SearchService searchService;
 
     @GetMapping("listPage")
     @ApiOperation("测试列表（分页）")
@@ -49,7 +52,7 @@ public class BeautyController {
             @ApiImplicitParam(name = "size", value = "每页条数，默认10条", dataType = "Integer", required = false),
             @ApiImplicitParam(name = "current", value = "第几页,默认第一页", dataType = "Integer", required = false)
     })
-    public Object listPage(String name,
+    public Object listPage(@RequestParam String name,
                            @RequestParam(defaultValue = "10") Integer size,
                            @RequestParam(defaultValue = "1") Integer current) {
         IPage<Beauty> beautyIPage = new Page<>(current, size);
@@ -63,7 +66,7 @@ public class BeautyController {
     @GetMapping("one")
     @ApiOperation("测试单个")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "id", value = "用户id", required = true, dataType = "Integer")
+            @ApiImplicitParam(name = "id", value = "用户id", required = true, dataType = "Integer")
     })
     public Object one(Integer id) {
         Beauty beauty = beautyService.getOneAndCache(id);
@@ -75,7 +78,7 @@ public class BeautyController {
     public Object add(Beauty beauty) {
         beauty.setCreatetime(new Date());
         beautyService.save(beauty);
-
+        searchService.save(new EsDocument("beauty_index", "beauty", BeanUtil.bean2Map(beauty)));
         return RespMsg.ok(beauty.getId());
     }
 
@@ -91,13 +94,14 @@ public class BeautyController {
     @ApiOperation("测试删除")
     public Object delete(Integer id) {
         beautyService.removeById(id);
+        searchService.delete(new EsDocument("beauty_index", "beauty", Cu.getMap("id", id)));
         return RespMsg.ok();
     }
 
     @PostMapping("batchDelete")
     @ApiOperation("测试批量删除")
     public Object batchDelete(Integer[] ids) {
-        if(ObjectUtil.isEmpty(ids)) {
+        if (ObjectUtil.isEmpty(ids)) {
             return RespMsg.error("参数不正确");
         }
         beautyService.removeByIds(Arrays.asList(ids));
@@ -107,10 +111,8 @@ public class BeautyController {
     @GetMapping("vote")
     @ApiOperation("投票")
     public Object vote(HttpServletRequest request, Integer id) {
-        System.out.println("开始调用beauty服务投票");
-        remoteVoteService.vote(request, id);
-        System.out.println("调用beauty服务投票结束");
-        return RespMsg.ok();
+        RespMsg voteResult = remoteVoteService.vote(request, id);
+        return voteResult;
     }
 
 }

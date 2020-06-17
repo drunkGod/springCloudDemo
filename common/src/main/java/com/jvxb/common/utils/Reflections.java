@@ -1,6 +1,7 @@
 package com.jvxb.common.utils;
 
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
@@ -13,14 +14,13 @@ import java.lang.reflect.*;
  * <p>
  * 提供调用getter/setter方法, 访问私有变量, 调用私有方法, 获取泛型类型Class, 被AOP过的真实类等工具函数.
  */
+@Slf4j
 public class Reflections {
     private static final String SETTER_PREFIX = "set";
 
     private static final String GETTER_PREFIX = "get";
 
     private static final String CGLIB_CLASS_SEPARATOR = "$$";
-
-    private static Logger logger = LoggerFactory.getLogger(Reflections.class);
 
     /**
      * 调用Getter方法.
@@ -70,7 +70,7 @@ public class Reflections {
         try {
             field.set(obj, value);
         } catch (IllegalAccessException e) {
-//			logger.error("..",e);
+//			log.error("..",e);
             ;
         }
     }
@@ -230,26 +230,26 @@ public class Reflections {
      *
      * @param clazz clazz The class to introspect
      * @param index the Index of the generic ddeclaration,start from 0.
-     * @return the index generic declaration, or Object.class if cannot be determined
+     * @return the index generic declaration, or Object.c  lass if cannot be determined
      */
     public static Class getClassGenricType(final Class clazz, final int index) {
 
         Type genType = clazz.getGenericSuperclass();
 
         if (!(genType instanceof ParameterizedType)) {
-            logger.warn(clazz.getSimpleName() + "'s superclass not ParameterizedType");
+            log.warn(clazz.getSimpleName() + "'s superclass not ParameterizedType");
             return Object.class;
         }
 
         Type[] params = ((ParameterizedType) genType).getActualTypeArguments();
 
         if ((index >= params.length) || (index < 0)) {
-            logger.warn("Index: " + index + ", Size of " + clazz.getSimpleName() + "'s Parameterized Type: "
+            log.warn("Index: " + index + ", Size of " + clazz.getSimpleName() + "'s Parameterized Type: "
                     + params.length);
             return Object.class;
         }
         if (!(params[index] instanceof Class)) {
-            logger.warn(clazz.getSimpleName() + " not set the actual class on superclass generic parameter");
+            log.warn(clazz.getSimpleName() + " not set the actual class on superclass generic parameter");
             return Object.class;
         }
 

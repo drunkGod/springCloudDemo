@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jvxb.manage.livable.mapper.SysUserMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.jvxb.manage.livable.entity.SysUser">
+        <id column="id" property="id" />
+        <result column="role_id" property="roleId" />
+        <result column="role_name" property="roleName" />
+        <result column="username" property="username" />
+        <result column="real_name" property="realName" />
+        <result column="password" property="password" />
+        <result column="phone" property="phone" />
+        <result column="valid" property="valid" />
+        <result column="create_time" property="createTime" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, role_id, role_name, username, real_name, password, phone, valid, create_time
+    </sql>
+
+</mapper>

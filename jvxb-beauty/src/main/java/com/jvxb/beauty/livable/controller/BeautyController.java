@@ -5,15 +5,14 @@ import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.core.toolkit.StringUtils;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.jvxb.beauty.livable.service.BeautyService;
+import com.jvxb.beauty.livable.service.VoteService;
+import com.jvxb.beauty.remote.SearchService;
+import com.jvxb.common.utils.Cu;
+import com.jvxb.common.utils.EsCondition;
 import com.jvxb.common.web.RespMsg;
 import com.jvxb.beauty.livable.entity.Beauty;
-import com.jvxb.beauty.livable.service.BeautyService;
 import com.jvxb.modules.utils.NetUtil;
-import com.jvxb.modules.livable.service.remoteservice.VoteService;
-import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
@@ -21,8 +20,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
@@ -41,9 +38,10 @@ import java.util.Map;
  */
 @RestController
 @RequestMapping("/beauty")
-@Api(tags = "美女")
 public class BeautyController {
 
+    @Autowired
+    private SearchService searchService;
     @Autowired
     private BeautyService beautyService;
     @Autowired
@@ -51,24 +49,11 @@ public class BeautyController {
     @Autowired
     private VoteService voteService;
 
-    @GetMapping("listPage")
-    @ApiOperation("测试列表（分页）")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "name", value = "姓名", required = false, dataType = "String"),
-            @ApiImplicitParam(name = "size", value = "每页条数，默认10条", dataType = "Integer", required = false),
-            @ApiImplicitParam(name = "current", value = "第几页,默认第一页", dataType = "Integer", required = false)
-    })
-    public Object listPage(@RequestParam String name,
-                           @RequestParam(defaultValue = "10") Integer size,
-                           @RequestParam(defaultValue = "1") Integer current) {
-        IPage<Beauty> beautyIPage = new Page<>(current, size);
-        QueryWrapper wrapper = new QueryWrapper();
-        wrapper.like(StringUtils.isNotEmpty(name), Beauty.NAME, name);
-        wrapper.orderByDesc(Beauty.PS);
-        beautyService.page(beautyIPage, wrapper);
-        return RespMsg.ok(beautyIPage);
+    public static void main(String[] args) {
+        EsCondition esCondition = new EsCondition();
+        esCondition.eq("field1","value1");
+        System.out.println(esCondition);
     }
-
 
     @GetMapping("list")
     @ApiOperation("测试列表（全量）")
@@ -76,13 +61,17 @@ public class BeautyController {
             @ApiImplicitParam(name = "name", value = "姓名", required = false, dataType = "String")
     })
     public Object list(String name) {
-        QueryWrapper wrapper = new QueryWrapper();
-        wrapper.like(StrUtil.isNotEmpty(name), Beauty.NAME, name);
-        wrapper.orderByDesc(Beauty.PS);
-        List<Beauty> list = beautyService.list(wrapper);
+
+
+        List<Beauty> list = searchService.list(name);
+        if (Cu.isNullOrEmpty(list)) {
+            QueryWrapper wrapper = new QueryWrapper();
+            wrapper.like(StrUtil.isNotEmpty(name), Beauty.NAME, name);
+            wrapper.orderByDesc(Beauty.PS);
+            list = beautyService.list(wrapper);
+        }
         return RespMsg.ok(list);
     }
-
 
     /**
      * 根据投票id，使其票数+1
@@ -93,7 +82,8 @@ public class BeautyController {
      */
     @GetMapping("vote")
     @ApiOperation("投票")
-    public Object vote(HttpServletRequest request, Integer id) {
+    public RespMsg vote(HttpServletRequest request, Integer id) {
+        System.out.println(DateUtil.format(new Date(), "HH:mm:ss") + "尝试投票：" + id);
         if (id == null || id < 0) {
             return RespMsg.error("无效投票");
         }
@@ -115,7 +105,7 @@ public class BeautyController {
             System.out.println(e.getMessage());
             return RespMsg.error("投票失败");
         }
-        return RespMsg.ok();
+        return RespMsg.ok("投票成功");
     }
 
     /**
@@ -142,9 +132,7 @@ public class BeautyController {
     }
 
     private boolean isInWhiteList(String clientIp) {
-        if (clientIp.equals("127.0.0.1")
-                || clientIp.equals("192.168.1.104")
-                || clientIp.equals("120.232.182.141")) {
+        if (clientIp.equals("127.0.0.1")) {
             return true;
         }
         return false;

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jvxb.manage.livable.mapper.SysPermissionMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.jvxb.manage.livable.entity.SysPermission">
+        <id column="perm_id" property="permId" />
+        <result column="perm_name" property="permName" />
+        <result column="perm_desc" property="permDesc" />
+        <result column="perm_pid" property="permPid" />
+        <result column="perm_url" property="permUrl" />
+        <result column="sort" property="sort" />
+        <result column="is_show" property="isShow" />
+        <result column="create_time" property="createTime" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        perm_id, perm_name, perm_desc, perm_pid, perm_url, sort, is_show, create_time
+    </sql>
+
+</mapper>

@@ -12,7 +12,6 @@ import javax.servlet.http.HttpServletResponse;
  * @author lcl
  * @since 2019-09-10
  */
-//@Component
 public class SecurityInterceptor implements HandlerInterceptor {
 
     @Autowired
@@ -31,7 +30,8 @@ public class SecurityInterceptor implements HandlerInterceptor {
                 return true;
             }
             //如果token错误，认为是已过期，需要重新登录。此时需要重新登录。
-            response.getOutputStream().print("{\"code\":" + SecurityConstant.UNAUTHORIZED + "}");
+            String unAuth = String.format("{\"code\": %s, \"message\": \"%s\"}", SecurityConstant.UNAUTHORIZED, "UNAUTHORIZED");
+            response.getOutputStream().print(unAuth);
             return false;
         }
         return false;

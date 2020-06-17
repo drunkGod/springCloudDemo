@@ -13,3 +13,25 @@ spring:
         service-id: service-config
       # 可以使用之前的版本。默认值可以是git label, branch name or commit id。可以使用多个Label，多个Label可以使用逗号分隔
       #label: Aspect
+
+##这个配置一定要放在bootstrap里才起作用
+#feign:
+#  hystrix:
+#    enabled: true
+#  httpclient:
+#    enabled: false
+#  okhttp:
+#    enabled: true
+#  client:
+#    config:
+#      default:
+#        connectTimeout: 12000
+#        readTimeout: 12000
+#hystrix:
+#  command:
+#    default:
+#      execution:
+#        isolation:
+#          thread:
+#            timeoutInMilliseconds: 11000
+

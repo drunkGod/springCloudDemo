@@ -18,11 +18,11 @@
         </encoder>
     </appender>
 
-    <appender name="info_file" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <appender name="warn_file" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>${path}/logback_info.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <!-- 每天一归档 -->
-            <fileNamePattern>${path}/logback_info.log.%d{yyyy-MM-dd}-%i.zip</fileNamePattern>
+            <fileNamePattern>${path}/logback_warn.log.%d{yyyy-MM-dd}-%i.zip</fileNamePattern>
             <maxHistory>${maxHistory}</maxHistory>
             <timeBasedFileNamingAndTriggeringPolicy
                     class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
@@ -34,7 +34,7 @@
             </pattern>
         </encoder>
         <filter class="ch.qos.logback.classic.filter.LevelFilter">
-            <level>INFO</level>
+            <level>WARN</level>
             <onMatch>ACCEPT</onMatch>
             <onMismatch>DENY</onMismatch>
         </filter>
@@ -65,7 +65,7 @@
     <root>
         <level value="info"/>
         <appender-ref ref="console"/>
-        <appender-ref ref="info_file"/>
+        <appender-ref ref="warn_file"/>
         <appender-ref ref="error_file"/>
     </root>
 

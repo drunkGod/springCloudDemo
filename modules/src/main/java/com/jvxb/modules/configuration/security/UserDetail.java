@@ -1,7 +1,5 @@
 package com.jvxb.modules.configuration.security;
 
-import cn.hutool.core.bean.BeanUtil;
-import com.jvxb.modules.livable.entity.User;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -33,12 +31,5 @@ public class UserDetail implements Serializable {
 
 	@ApiModelProperty(value = "用户角色")
 	private String roles;
-
-
-	public UserDetail(User user) {
-		if (user != null) {
-			BeanUtil.copyProperties(user, this);
-		}
-	}
 
 }

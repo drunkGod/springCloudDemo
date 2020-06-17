@@ -3,9 +3,9 @@ server:
 
 spring:
   datasource:
-    bg:
+    beauty:
       driver-class-name: com.mysql.jdbc.Driver
-      jdbc-url: jdbc:mysql://127.0.0.1:3306/bg_manage?useUnicode=true&serverTimezone=GMT%2B8&characterEncoding=utf8&useSSL=false
+      jdbc-url: jdbc:mysql://127.0.0.1:3306/beauty?useUnicode=true&serverTimezone=GMT%2B8&characterEncoding=utf8&useSSL=false
       username: root
       password: 123456
   redis:
