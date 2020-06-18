@@ -68,7 +68,7 @@ public class GeneralSearchController {
      * - 获取内容（fetch/fetchSource），对应内容：includes（需要获取的字段）、excludes不需要获取的字段
      * 不需要的 key可以为空或 key对应value为null，实例如下：
      * {
-     * "field":  {"field1": "equal v1", "field2": “like v2”},
+     * "field":  {"field1": "equal v1", "field2": "like v2", "field3": "in [v3, v4]"},
      * "range": {"field1": "between v1,v2", "field2": “lte v2”, "field3": "gt v3"},
      * "sort": {"field1": “desc”, "field2": "asc"},
      * “hightLight”: null,

@@ -6,7 +6,7 @@ import com.jvxb.search.configuration.exception.EsSearchException;
 import com.jvxb.search.livable.entity.EsDocument;
 import com.jvxb.search.livable.entity.SearchResult;
 import com.jvxb.search.livable.service.GeneralSearchService;
-import com.jvxb.search.utils.QueryHelper;
+import com.jvxb.search.utils.EsConditionResolve;
 import org.apache.http.HttpHost;
 import org.elasticsearch.action.bulk.BulkRequestBuilder;
 import org.elasticsearch.action.bulk.BulkResponse;
@@ -106,14 +106,14 @@ public class GeneralSearchServiceImpl implements GeneralSearchService {
         //单次查询超过1W时，需要使用scroll方式查询。否则容易造成OOM。
         int maxIndexWindowResult = 10000;
         if (searchResult.getPageNum() * searchResult.getPageSize() > maxIndexWindowResult) {
-            return QueryHelper.queryInScroll(client, requestBuilder, searchResult, maxIndexWindowResult);
+            return EsConditionResolve.queryInScroll(client, requestBuilder, searchResult, maxIndexWindowResult);
         }
         //普通from-to查询
         SearchHits searchHits = requestBuilder.get().getHits();
         if (searchHits.getTotalHits() == 0L) {
             return searchResult;
         }
-        QueryHelper.convertSearchResonse2ResultList(searchHits, searchResult);
+        EsConditionResolve.convertSearchResonse2ResultList(searchHits, searchResult);
         return searchResult;
     }
 
@@ -138,7 +138,7 @@ public class GeneralSearchServiceImpl implements GeneralSearchService {
             if (num == 0L) {
                 return searchResult;
             }
-            QueryHelper.convertSearchResonse2ResultList(searchHits, searchResult);
+            EsConditionResolve.convertSearchResonse2ResultList(searchHits, searchResult);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -172,8 +172,10 @@ public class GeneralSearchServiceImpl implements GeneralSearchService {
             if (!BeanUtil.isJSONValid(condition)) {
                 throw new EsSearchException("查询参数转换为Map异常。参数：" + condition);
             }
-            QueryHelper.resolveQuery(requestBuilder, boolQueryBuilder, BeanUtil.jsonStr2Map(condition), searchResult);
+            EsConditionResolve.resolveQuery(requestBuilder, boolQueryBuilder, BeanUtil.jsonStr2Map(condition), searchResult);
         }
+        System.out.println("boolQueryBuilder:" + boolQueryBuilder);
+        System.out.println("requestBuilder:" + requestBuilder);
     }
 
     private void checkAndResolveConditoin(SearchSourceBuilder requestBuilder, BoolQueryBuilder boolQueryBuilder, String condition, SearchResult searchResult) {
@@ -181,7 +183,7 @@ public class GeneralSearchServiceImpl implements GeneralSearchService {
             if (!BeanUtil.isJSONValid(condition)) {
                 throw new EsSearchException("查询参数转换为Map异常。参数：" + condition);
             }
-            QueryHelper.resolveHighLevelQuery(requestBuilder, boolQueryBuilder, BeanUtil.jsonStr2Map(condition), searchResult);
+            EsConditionResolve.resolveHighLevelQuery(requestBuilder, boolQueryBuilder, BeanUtil.jsonStr2Map(condition), searchResult);
         }
     }
 

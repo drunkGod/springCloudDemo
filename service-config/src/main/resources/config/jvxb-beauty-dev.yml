@@ -25,10 +25,10 @@ spring:
   rabbitmq:
     host: 47.112.148.36
     port: 5672
-    username: test
-    password: test
+    username: admin
+    password: 123456
     #rbbitmq虚拟主机路径默认为/,其它主机需配置权限
-    virtual-host: test
+    virtual-host: /
     publisher-confirms: true  #发送确认,默认是false
     listener:
       simple:

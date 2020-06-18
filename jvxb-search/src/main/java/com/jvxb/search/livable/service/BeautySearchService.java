@@ -8,5 +8,5 @@ import java.util.Map;
  * @since 2020-04-05
  */
 public interface BeautySearchService {
-    List queryList();
+    List queryList(String name);
 }

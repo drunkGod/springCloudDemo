@@ -87,6 +87,7 @@ public class BeautyController {
     public Object update(Beauty beauty) {
         System.out.println(beauty);
         beautyService.updateByIdAndCache(beauty);
+        searchService.save(new EsDocument("beauty_index", "beauty", BeanUtil.bean2Map(beauty)));
         return RespMsg.ok(beauty);
     }
 

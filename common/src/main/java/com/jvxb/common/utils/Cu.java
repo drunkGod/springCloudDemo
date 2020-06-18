@@ -69,13 +69,5 @@ public class Cu {
         return list;
     }
 
-    // "a, b" -> ["a","b"]
-    public static String[] convert2StrTrimArr(Object obj) {
-        String[] arr = null;
-        if (Cu.notNullOrEmpty(obj)) {
-            arr = Arrays.stream(obj.toString().split(",")).map(e -> e.trim()).toArray(String[]::new);
-        }
-        return arr;
-    }
 
 }

@@ -8,9 +8,7 @@ import com.jvxb.search.livable.entity.EsDocument;
 import com.jvxb.search.livable.repository.BeautyRepository;
 import com.jvxb.search.livable.service.BeautySearchService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -35,14 +33,14 @@ public class BeautySearchController {
     private BeautyRepository beautyRepository;
 
     @RequestMapping("list")
-    public RespMsg list() {
+    public RespMsg list(String name) {
         System.out.println("搜索全部美女");
-        List<Map> mapList = beautySearchService.queryList();
+        List<Map> mapList = beautySearchService.queryList(name);
         return RespMsg.ok(mapList);
     }
 
     @PostMapping("save/all")
-    public Object saveAll(List<EsDocument> esDocumentList) {
+    public Object saveAll(@RequestBody List<EsDocument> esDocumentList) {
         List<Beauty> beauties = new ArrayList<>();
         for (EsDocument esDocument : esDocumentList) {
             beauties.add(BeanUtil.map2Bean(esDocument.getDocument(), Beauty.class));
@@ -52,14 +50,14 @@ public class BeautySearchController {
     }
 
     @PostMapping("save")
-    public Object save(EsDocument document) {
+    public Object save(@RequestBody EsDocument document) {
         Beauty beauty = BeanUtil.map2Bean(document.getDocument(), Beauty.class);
         beautyRepository.save(beauty);
         return RespMsg.ok();
     }
 
     @PostMapping("delete")
-    public Object delete(EsDocument document) {
+    public Object delete(@RequestBody EsDocument document) {
         Beauty beauty = BeanUtil.map2Bean(document.getDocument(), Beauty.class);
         beautyRepository.delete(beauty);
         return RespMsg.ok();

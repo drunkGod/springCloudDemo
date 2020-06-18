@@ -4,8 +4,8 @@ server:
 spring:
   data:
     elasticsearch:
-      cluster-name: elasticsearch
-      cluster-nodes: 47.112.148.36:9300
+      cluster-name: jvxb-es
+      cluster-nodes: 47.112.148.36:19300
 
 management:
   health:

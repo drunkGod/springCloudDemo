@@ -3,6 +3,7 @@ package com.jvxb.beauty.remote;
 import com.jvxb.beauty.livable.entity.Beauty;
 import com.jvxb.beauty.remote.impl.MockSearchServiceImpl;
 import com.jvxb.common.base.entity.es.EsDocument;
+import com.jvxb.common.web.RespMsg;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -23,5 +24,5 @@ public interface SearchService {
     void save(@RequestBody EsDocument esDocument);
 
     @GetMapping("/search/beauty/v1/list")
-    List<Beauty> list(@RequestParam("name") String name);
+    RespMsg<List<Beauty>> list(@RequestParam("name") String name);
 }

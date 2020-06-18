@@ -1,4 +1,4 @@
-package com.jvxb.search.configuration;
+package com.jvxb.search.configuration.config;
 
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.InitializingBean;
@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
  */
 @Log4j2
 @Component
-public class ElasticSearchConfiguration implements InitializingBean {
+public class SystemPropertyConfiguration implements InitializingBean {
 
     static {
         System.setProperty("es.set.netty.runtime.available.processors", "false");

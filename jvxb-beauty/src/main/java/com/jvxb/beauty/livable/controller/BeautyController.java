@@ -5,6 +5,7 @@ import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.google.common.collect.Lists;
 import com.jvxb.beauty.livable.service.BeautyService;
 import com.jvxb.beauty.livable.service.VoteService;
 import com.jvxb.beauty.remote.SearchService;
@@ -23,10 +24,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * <p>
@@ -61,9 +59,8 @@ public class BeautyController {
             @ApiImplicitParam(name = "name", value = "姓名", required = false, dataType = "String")
     })
     public Object list(String name) {
-
-
-        List<Beauty> list = searchService.list(name);
+        List<Beauty> list = Optional.ofNullable(searchService.list(name)).map(e -> e.getData()).orElse(Lists.newArrayList());
+        System.out.println("es result:" + list.size());
         if (Cu.isNullOrEmpty(list)) {
             QueryWrapper wrapper = new QueryWrapper();
             wrapper.like(StrUtil.isNotEmpty(name), Beauty.NAME, name);
@@ -100,12 +97,32 @@ public class BeautyController {
             voteMap.put("voteId", id);
             voteMap.put("clientIp", clientIp);
             voteMap.put("voteTime", DateUtil.now());
+            Beauty byId = beautyService.getById(id);
+            byId.setPs(byId.getPs()+1);
+//            beautyService.save(byId);
             voteService.vote(voteMap);
         } catch (Exception e) {
             System.out.println(e.getMessage());
+            undoRedisVote(clientIp);
             return RespMsg.error("投票失败");
         }
         return RespMsg.ok("投票成功");
+    }
+
+    private void undoRedisVote(String clientIp) {
+        String redisKey = "vote:" + clientIp;
+        String clientValue = (String) redisTemplate.opsForValue().get(redisKey);
+        String today = DateUtil.formatDate(new Date());
+        //如果已经投过票，判断其上一次投的时间。
+        if (ObjectUtil.isNotEmpty(clientValue)) {
+            String lastDay = clientValue.substring(clientValue.length() - 10);
+            //如果上一次投票时间为今天，则不允许再投。（白名单除外）
+            if (lastDay.equals(today) && !isInWhiteList(clientIp)) {
+                clientValue = clientValue.substring(0, clientValue.length() - 10);
+                //redis中形式如： key = "vote:127.0.0.1", value = "2020-02-02,2020-02-03";
+                redisTemplate.opsForValue().set(redisKey, (ObjectUtil.isNotEmpty(clientValue) ? (clientValue + ",") : "") + today);
+            }
+        }
     }
 
     /**
