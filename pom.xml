@@ -44,7 +44,7 @@
         <pinyin4j.version>2.5.1</pinyin4j.version>
         <dubbo.version>2.5.3</dubbo.version>
         <zkclient.version>0.1</zkclient.version>
-        <httpclient.version>4.5.9</httpclient.version>
+        <httpclient.version>4.5.13</httpclient.version>
         <spring-cloud.version>Greenwich.RELEASE</spring-cloud.version>
         <spring-boot-admin.version>2.1.5</spring-boot-admin.version>
     </properties>
