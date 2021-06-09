@@ -1,4 +1,4 @@
-package com.example.demo;
+package com.jvxb.demo.sbDemo;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -42,9 +42,9 @@ public class MyCodeGenerator {
 
     //---------------------------配置值------------------------------//
     //库名
-    private static final String dbName = "jvxb-beauty";
+    private static final String dbName = "lcltest";
     //表名
-    private static final String tableName = "domain_compare";
+    private static final String tableName = "global_menu";
 
     //数据库账号
     private static final String username = "root";
@@ -54,8 +54,8 @@ public class MyCodeGenerator {
     private static final String url = "jdbc:mysql://localhost:3306/" + dbName + "?useUnicode=true&useSSL=false&characterEncoding=utf8";
 
     //生成路径为： mainPath + moduleName 下的 controller/service/mapper
-    private static final String mainPath = "D:\\devcode\\gitcode\\latest\\gitee-local\\code\\demo\\src\\main";
-    private static final String moduleName = "com\\vivo\\dba\\dbcmdb";
+    private static final String mainPath = "D:\\devcode\\gitcode\\latest\\sbDemo\\src\\main";
+    private static final String moduleName = "com\\vivo\\dba\\volzhski";
     //Author
     private static final String author = "72084300";
 
@@ -83,7 +83,8 @@ public class MyCodeGenerator {
     private static final String mapperXmlPath = baseResource + "\\" + "mapper";
     private static final String moduleNameInDot = moduleName.replaceAll("\\\\", ".");
     private static String primaryKey = "";
-    private static String primaryJavaType = "";
+    private static String primaryJavaName = "";
+    private static String primaryJavaType = "Object";
     private static List<Map> columnInfoList = null;
 
 
@@ -154,14 +155,13 @@ public class MyCodeGenerator {
     }
 
     private static void addJavaColumnName(List<Map> columnInfoList) {
-        primaryKey = "";
-        primaryJavaType = "Object";
         if (!columnInfoList.isEmpty()) {
             for (Map columnMap : columnInfoList) {
                 columnMap.put("JAVA_COLUMN_NAME", underlineToCamel(columnMap.get("COLUMN_NAME").toString(), false));
                 columnMap.put("JAVA_DATA_TYPE", dbTypeToJavaType(columnMap.get("DATA_TYPE").toString()));
                 if (columnMap.get("COLUMN_KEY") != null && columnMap.get("COLUMN_KEY").toString().equalsIgnoreCase("PRI")) {
                     primaryKey = columnMap.get("COLUMN_NAME").toString();
+                    primaryJavaName = underlineToCamel(primaryKey, false);
                     primaryJavaType = dbTypeToJavaType(columnMap.get("DATA_TYPE").toString());
                 }
             }
@@ -195,53 +195,56 @@ public class MyCodeGenerator {
                         "        PUBLIC \"-//mybatis.org//DTD Mapper 3.0//EN\"\n" +
                         "        \"http://mybatis.org/dtd/mybatis-3-mapper.dtd\">\n" +
                         "\n" +
-                        "<mapper namespace=\"%s.mapper.%sMapper\">\n" +
+                        "<mapper namespace=\"$moduleNameInDot.mapper.$entityNameMapper\">\n" +
                         "\n" +
                         "    <!-- 通用查询映射结果 -->\n" +
-                        "    <resultMap id=\"BaseResultMap\" type=\"%s.entity.%s\">\n" +
+                        "    <resultMap id=\"BaseResultMap\" type=\"$moduleNameInDot.entity.$entityName\">\n" +
                         "        %s\n" +
                         "    </resultMap>\n" +
                         "\n" +
-                        "    <insert id=\"save\" parameterType=\"%s.entity.%s\" useGeneratedKeys=\"true\" %s>\n" +
-                        "        INSERT INTO `%s` (%s)\n" +
+                        "    <insert id=\"save\" parameterType=\"$moduleNameInDot.entity.$entityName\" useGeneratedKeys=\"true\" %s>\n" +
+                        "        INSERT INTO $tableName (%s)\n" +
                         "        VALUES (%s)\n" +
                         "    </insert>\n" +
                         "\n" +
-                        "    <update id=\"updateById\" parameterType=\"%s.entity.%s\">\n" +
-                        "        update `%s` set\n" +
+                        "    <update id=\"updateById\" parameterType=\"$moduleNameInDot.entity.$entityName\">\n" +
+                        "        update $tableName set\n" +
                         "        %s\n" +
-                        "        where %s = #{%s}\n" +
+                        "        where $primaryKey = #{$primaryJavaName}\n" +
                         "    </update>\n" +
                         "\n" +
                         "    <select id=\"selectById\" resultMap=\"BaseResultMap\">\n" +
                         "        select\n" +
                         "        *\n" +
-                        "        from %s\n" +
-                        "        where %s = #{%s}\n" +
+                        "        from $tableName\n" +
+                        "        where $primaryKey = #{$primaryJavaName}\n" +
+                        "    </select>\n" +
+                        "\n" +
+                        "    <delete id=\"deleteById\" parameterType=\"java.lang.$primaryJavaType\">\n" +
+                        "        delete from $tableName\n" +
+                        "        where $primaryKey = #{$primaryJavaName}\n" +
+                        "    </delete>\n" +
+                        "\n" +
+                        "    <select id=\"selectList\" resultMap=\"BaseResultMap\">\n" +
+                        "        select\n" +
+                        "        *\n" +
+                        "        from $tableName\n" +
                         "    </select>\n" +
                         "\n" +
                         "</mapper>",
-                moduleNameInDot,
-                entityName,
-                moduleNameInDot,
-                entityName,
                 getBaseResultMap(),
-                moduleNameInDot,
-                entityName,
-                primaryKey.length() == 0 ? "" : ("keyProperty=\"" + underlineToCamel(primaryKey, false) + "\""),
-                tableName,
+                primaryKey.length() == 0 ? "" : ("keyProperty=\"" + primaryJavaName + "\""),
                 getInsertDbColumns(),
                 getInsertJavaColumns(),
-                moduleNameInDot,
-                entityName,
-                tableName,
-                getUpdateColumns(),
-                primaryKey,
-                underlineToCamel(primaryKey, false),
-                tableName,
-                primaryKey,
-                underlineToCamel(primaryKey, false)
+                getUpdateColumns()
         );
+        baseContent = baseContent.replace("$moduleNameInDot", moduleNameInDot);
+        baseContent = baseContent.replace("$entityName", entityName);
+        baseContent = baseContent.replace("$lowerEntityName", lowerFirst(entityName));
+        baseContent = baseContent.replace("$primaryJavaType", primaryJavaType);
+        baseContent = baseContent.replace("$primaryJavaName", primaryJavaName);
+        baseContent = baseContent.replace("$tableName", tableName);
+        baseContent = baseContent.replace("$primaryKey", primaryKey);
         return baseContent;
     }
 
@@ -403,10 +406,11 @@ public class MyCodeGenerator {
     }
 
     private static String getMapperDefaultContent() {
-        String baseContent = String.format("package %s.mapper;\n" +
+        String baseContent = String.format("package $moduleNameInDot.mapper;\n" +
                         "\n" +
-                        "import org.apache.ibatis.annotations.Mapper;\n" +
-                        "%s\n" +
+                        "%s" +
+                        "import java.util.List;\n" +
+                        "import $moduleNameInDot.entity.$entityName;\n" +
                         "\n" +
                         "\n" +
                         "/**\n" +
@@ -414,30 +418,29 @@ public class MyCodeGenerator {
                         " * @since %s\n" +
                         " */\n" +
                         "%s" +
-                        "public interface %sMapper {\n" +
+                        "public interface $entityNameMapper {\n" +
                         "\n" +
-                        "    void save(%s %s);\n" +
+                        "    void save($entityName $lowerEntityName);\n" +
                         "\n" +
-                        "    void updateById(%s %s);\n" +
+                        "    void deleteById($primaryJavaType $primaryJavaName);\n" +
                         "\n" +
-                        "    %s selectById(%s %s);\n" +
+                        "    void updateById($entityName $lowerEntityName);\n" +
+                        "\n" +
+                        "    $entityName selectById($primaryJavaType $primaryJavaName);\n" +
+                        "\n" +
+                        "    List<$entityName> selectList();\n" +
                         "\n" +
                         "}",
-                moduleNameInDot,
-                String.format("import %s.entity.%s;", moduleNameInDot, entityName),
+                useMapperNote ? "import org.apache.ibatis.annotations.Mapper;\n" : "",
                 author,
                 today(),
-                useMapperNote ? "@Mapper\n" : "",
-                entityName,
-                entityName,
-                lowerFirst(entityName),
-                entityName,
-                lowerFirst(entityName),
-                entityName,
-                primaryJavaType,
-                primaryKey
+                useMapperNote ? "@Mapper\n" : ""
         );
-
+        baseContent = baseContent.replace("$moduleNameInDot", moduleNameInDot);
+        baseContent = baseContent.replace("$entityName", entityName);
+        baseContent = baseContent.replace("$lowerEntityName", lowerFirst(entityName));
+        baseContent = baseContent.replace("$primaryJavaType", primaryJavaType);
+        baseContent = baseContent.replace("$primaryJavaName", primaryJavaName);
         return baseContent;
     }
 
@@ -461,7 +464,7 @@ public class MyCodeGenerator {
 
     private static String getEntityDefaultContent() {
         String columnInfo = columnInfoListToStr(columnInfoList);
-        String baseContent = String.format("package %s.entity;\n" +
+        String baseContent = String.format("package $moduleNameInDot.entity;\n" +
                         "\n" +
                         "%s" +
                         "\n" +
@@ -470,19 +473,19 @@ public class MyCodeGenerator {
                         " * @since %s\n" +
                         " */\n" +
                         "%s" +
-                        "public class %s {\n" +
+                        "public class $entityName {\n" +
                         "\n" +
                         "%s" +
                         "\n" +
                         "}\n",
-                moduleNameInDot,
                 getImport(columnInfo),
                 author,
                 today(),
                 useLombok ? "@Data\n" : "",
-                entityName,
                 columnInfo
         );
+        baseContent = baseContent.replace("$moduleNameInDot", moduleNameInDot);
+        baseContent = baseContent.replace("$entityName", entityName);
         return baseContent;
     }
 
@@ -568,27 +571,58 @@ public class MyCodeGenerator {
     }
 
     private static String getServiceImplDefaultContent() {
-        String baseContent = String.format("package %s.service.impl;\n" +
+        String baseContent = String.format("package $moduleNameInDot.service.impl;\n" +
                         "\n" +
                         "import org.springframework.stereotype.Service;\n" +
-                        "import %s.service.%sService;\n" +
+                        "import org.springframework.beans.factory.annotation.Autowired;\n" +
+                        "import java.util.List;\n" +
+                        "import $moduleNameInDot.service.$entityNameService;\n" +
+                        "import $moduleNameInDot.mapper.$entityNameMapper;\n" +
+                        "import $moduleNameInDot.entity.$entityName;\n" +
                         "\n" +
                         "/**\n" +
                         " * @author %s\n" +
                         " * @since %s\n" +
                         " */\n" +
                         "@Service\n" +
-                        "public class %sServiceImpl implements %sService{\n" +
+                        "public class $entityNameServiceImpl implements $entityNameService{\n" +
                         "\n" +
+                        "    @Autowired\n" +
+                        "    private $entityNameMapper $lowerEntityNameMapper;\n" +
+                        "\n" +
+                        "    @Override\n" +
+                        "    public void save($entityName $lowerEntityName) {\n" +
+                        "        $lowerEntityNameMapper.save($lowerEntityName);\n" +
+                        "    }\n" +
+                        "\n" +
+                        "    @Override\n" +
+                        "    public void deleteById($primaryJavaType $primaryJavaName) {\n" +
+                        "        $lowerEntityNameMapper.deleteById($primaryJavaName);\n" +
+                        "    }\n" +
+                        "\n" +
+                        "    @Override\n" +
+                        "    public void updateById($entityName $lowerEntityName) {\n" +
+                        "        $lowerEntityNameMapper.updateById($lowerEntityName);\n" +
+                        "    }\n" +
+                        "\n" +
+                        "    @Override\n" +
+                        "    public $entityName selectById($primaryJavaType $primaryJavaName) {\n" +
+                        "        return $lowerEntityNameMapper.selectById($primaryJavaName);\n" +
+                        "    }\n" +
+                        "\n" +
+                        "    @Override\n" +
+                        "    public List<$entityName> selectList() {\n" +
+                        "        return $lowerEntityNameMapper.selectList();\n" +
+                        "    }\n" +
                         "}\n",
-                moduleNameInDot,
-                moduleNameInDot,
-                entityName,
                 author,
-                today(),
-                entityName,
-                entityName
-        );
+                today()
+                );
+        baseContent = baseContent.replace("$moduleNameInDot", moduleNameInDot);
+        baseContent = baseContent.replace("$entityName", entityName);
+        baseContent = baseContent.replace("$lowerEntityName", lowerFirst(entityName));
+        baseContent = baseContent.replace("$primaryJavaType", primaryJavaType);
+        baseContent = baseContent.replace("$primaryJavaName", primaryJavaName);
         return baseContent;
     }
 
@@ -603,20 +637,34 @@ public class MyCodeGenerator {
     }
 
     private static String getServiceDefaultContent() {
-        String baseContent = String.format("package %s.service;\n" +
+        String baseContent = String.format("package $moduleNameInDot.service;\n" +
                         "\n" +
+                        "import java.util.List;\n" +
+                        "import $moduleNameInDot.entity.$entityName;\n" +
                         "/**\n" +
                         " * @author %s\n" +
                         " * @since %s\n" +
                         " */\n" +
-                        "public interface %sService {\n" +
+                        "public interface $entityNameService {\n" +
                         "\n" +
+                        "    void save($entityName $lowerEntityName);\n" +
+                        "\n" +
+                        "    void deleteById($primaryJavaType $primaryJavaName);\n" +
+                        "\n" +
+                        "    void updateById($entityName $lowerEntityName);\n" +
+                        "\n" +
+                        "    $entityName selectById($primaryJavaType $primaryJavaName);\n" +
+                        "\n" +
+                        "    List<$entityName> selectList();\n" +
                         "}\n",
-                moduleNameInDot,
                 author,
-                today(),
-                entityName
+                today()
         );
+        baseContent = baseContent.replace("$moduleNameInDot", moduleNameInDot);
+        baseContent = baseContent.replace("$entityName", entityName);
+        baseContent = baseContent.replace("$lowerEntityName", lowerFirst(entityName));
+        baseContent = baseContent.replace("$primaryJavaType", primaryJavaType);
+        baseContent = baseContent.replace("$primaryJavaName", primaryJavaName);
         return baseContent;
     }
 
