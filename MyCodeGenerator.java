@@ -1,4 +1,4 @@
-package com.jvxb.demo.sbDemo;
+package com.vivo.dba.camapa;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -14,37 +14,37 @@ import java.util.*;
  * 代码生成器使用步骤：
  * <p>
  * 1、导入依赖，如果不使用lombok，需设置 useLombok = false;
-
-     <dependency>
-     <groupId>mysql</groupId>
-     <artifactId>mysql-connector-java</artifactId>
-     <version>5.1.48</version>
-     </dependency>
-
-     <dependency>
-     <groupId>org.mybatis.spring.boot</groupId>
-     <artifactId>mybatis-spring-boot-starter</artifactId>
-     <version>2.1.4</version>
-     </dependency>
-
-     <dependency>
-     <groupId>org.projectlombok</groupId>
-     <artifactId>lombok</artifactId>
-     </dependency>
-
-
+ *
+ * <dependency>
+ * <groupId>mysql</groupId>
+ * <artifactId>mysql-connector-java</artifactId>
+ * <version>5.1.48</version>
+ * </dependency>
+ *
+ * <dependency>
+ * <groupId>org.mybatis.spring.boot</groupId>
+ * <artifactId>mybatis-spring-boot-starter</artifactId>
+ * <version>2.1.4</version>
+ * </dependency>
+ *
+ * <dependency>
+ * <groupId>org.projectlombok</groupId>
+ * <artifactId>lombok</artifactId>
+ * </dependency>
+ * <p>
+ * <p>
  * 2、修改配置值
  * 如修改数据库连接地址、基本包所在路径（mainPath、moduleName）等。
- *
+ * <p>
  * 3、运行main方法
  */
 public class MyCodeGenerator {
 
     //---------------------------配置值------------------------------//
     //库名
-    private static final String dbName = "lcltest";
+    private static final String dbName = "camapa";
     //表名
-    private static final String tableName = "global_menu";
+    private static final String tableName = "exp_msg_record";
 
     //数据库账号
     private static final String username = "root";
@@ -54,11 +54,18 @@ public class MyCodeGenerator {
     private static final String url = "jdbc:mysql://localhost:3306/" + dbName + "?useUnicode=true&useSSL=false&characterEncoding=utf8";
 
     //生成路径为： mainPath + moduleName 下的 controller/service/mapper
-    private static final String mainPath = "D:\\devcode\\gitcode\\latest\\sbDemo\\src\\main";
-    private static final String moduleName = "com\\vivo\\dba\\volzhski";
+    private static final String mainPath = "D:\\devcode\\gitcode\\latest\\gitee-local\\code\\camapa\\src\\main";
+    private static final String moduleName = "com\\vivo\\dba\\camapa";
     //Author
     private static final String author = "72084300";
-
+    //是否使用lombok
+    private static final boolean useLombok = true;
+    //是否使用@Mapper注解。如果已经使用了@MapperScan可以设置为false
+    private static final boolean useMapperNote = false;
+    //是否使用MybatisPlus
+    private static final boolean useMybatisPlus = true;
+    //是否使用column constant
+    private static final boolean useEntityColumnConstant = true;
 
     //---------------------------默认值------------------------------//
     //实体名
@@ -68,10 +75,7 @@ public class MyCodeGenerator {
     private static final String baseResource = mainPath + "\\resources";
     //是否覆盖原有文件
     private static final boolean isOverrideFile = true;
-    //是否使用lombok
-    private static final boolean useLombok = true;
-    //是否使用@Mapper注解。如果已经使用了@MapperScan可以设置为false
-    private static final boolean useMapperNote = true;
+
     //数据库驱动
     private static final String driver = "com.mysql.jdbc.Driver";
     //包路径：
@@ -126,8 +130,34 @@ public class MyCodeGenerator {
         if (f.exists() && !isOverrideFile) {
             return;
         }
-        writeFile(pathname, getMapperXmlDefaultContent());
+        writeFile(pathname, useMybatisPlus ? getMapperPlusXmlDefaultContent() : getMapperXmlDefaultContent());
 
+    }
+
+    private static String getMapperPlusXmlDefaultContent() {
+        String baseContent = String.format("<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n" +
+                        "<!DOCTYPE mapper\n" +
+                        "        PUBLIC \"-//mybatis.org//DTD Mapper 3.0//EN\"\n" +
+                        "        \"http://mybatis.org/dtd/mybatis-3-mapper.dtd\">\n" +
+                        "\n" +
+                        "<mapper namespace=\"$moduleNameInDot.mapper.$entityNameMapper\">\n" +
+                        "\n" +
+                        "    <!-- 通用查询映射结果 -->\n" +
+                        "    <resultMap id=\"BaseResultMap\" type=\"$moduleNameInDot.entity.$entityName\">\n" +
+                        "        %s\n" +
+                        "    </resultMap>\n" +
+                        "\n" +
+                        "</mapper>",
+                getBaseResultMap()
+        );
+        baseContent = baseContent.replace("$moduleNameInDot", moduleNameInDot);
+        baseContent = baseContent.replace("$entityName", entityName);
+        baseContent = baseContent.replace("$lowerEntityName", lowerFirst(entityName));
+        baseContent = baseContent.replace("$primaryJavaType", primaryJavaType);
+        baseContent = baseContent.replace("$primaryJavaName", primaryJavaName);
+        baseContent = baseContent.replace("$tableName", tableName);
+        baseContent = baseContent.replace("$primaryKey", primaryKey);
+        return baseContent;
     }
 
     private static List<Map> getColumnInfo() {
@@ -202,7 +232,7 @@ public class MyCodeGenerator {
                         "        %s\n" +
                         "    </resultMap>\n" +
                         "\n" +
-                        "    <insert id=\"save\" parameterType=\"$moduleNameInDot.entity.$entityName\" useGeneratedKeys=\"true\" %s>\n" +
+                        "    <insert id=\"insert\" parameterType=\"$moduleNameInDot.entity.$entityName\" useGeneratedKeys=\"true\" %s>\n" +
                         "        INSERT INTO $tableName (%s)\n" +
                         "        VALUES (%s)\n" +
                         "    </insert>\n" +
@@ -402,7 +432,37 @@ public class MyCodeGenerator {
         if (f.exists() && !isOverrideFile) {
             return;
         }
-        writeFile(pathname, getMapperDefaultContent());
+        writeFile(pathname, useMybatisPlus ? getMapperPlusDefaultContent() : getMapperDefaultContent());
+    }
+
+    private static String getMapperPlusDefaultContent() {
+        String baseContent = String.format("package $moduleNameInDot.mapper;\n" +
+                        "\n" +
+                        "%s" +
+                        "%s" +
+                        "import $moduleNameInDot.entity.$entityName;\n" +
+                        "\n" +
+                        "\n" +
+                        "/**\n" +
+                        " * @author %s\n" +
+                        " * @since %s\n" +
+                        " */\n" +
+                        "%s" +
+                        "public interface $entityNameMapper extends BaseMapper<$entityName> {\n" +
+                        "\n" +
+                        "}",
+                useMapperNote ? "import org.apache.ibatis.annotations.Mapper;\n" : "",
+                useMybatisPlus ? "import com.baomidou.mybatisplus.core.mapper.BaseMapper;\n" : "",
+                author,
+                today(),
+                useMapperNote ? "@Mapper\n" : ""
+        );
+        baseContent = baseContent.replace("$moduleNameInDot", moduleNameInDot);
+        baseContent = baseContent.replace("$entityName", entityName);
+        baseContent = baseContent.replace("$lowerEntityName", lowerFirst(entityName));
+        baseContent = baseContent.replace("$primaryJavaType", primaryJavaType);
+        baseContent = baseContent.replace("$primaryJavaName", primaryJavaName);
+        return baseContent;
     }
 
     private static String getMapperDefaultContent() {
@@ -420,7 +480,7 @@ public class MyCodeGenerator {
                         "%s" +
                         "public interface $entityNameMapper {\n" +
                         "\n" +
-                        "    void save($entityName $lowerEntityName);\n" +
+                        "    void insert($entityName $lowerEntityName);\n" +
                         "\n" +
                         "    void deleteById($primaryJavaType $primaryJavaName);\n" +
                         "\n" +
@@ -473,41 +533,56 @@ public class MyCodeGenerator {
                         " * @since %s\n" +
                         " */\n" +
                         "%s" +
+                        "%s" +
                         "public class $entityName {\n" +
                         "\n" +
                         "%s" +
                         "\n" +
+                        "%s" +
                         "}\n",
                 getImport(columnInfo),
                 author,
                 today(),
                 useLombok ? "@Data\n" : "",
-                columnInfo
+                useMybatisPlus ? "@TableName(\"" + tableName + "\")\n" : "",
+                columnInfo,
+                useEntityColumnConstant ? entityColumnConstant() : ""
         );
         baseContent = baseContent.replace("$moduleNameInDot", moduleNameInDot);
         baseContent = baseContent.replace("$entityName", entityName);
         return baseContent;
     }
 
+    private static String entityColumnConstant() {
+        StringBuilder sb = new StringBuilder();
+        for (Map columnInfo : columnInfoList) {
+            sb.append(String.format("    private static final String %s = \"%s\";\n\n",
+                    columnInfo.get("COLUMN_NAME").toString().toUpperCase(),
+                    columnInfo.get("COLUMN_NAME")));
+        }
+        return sb.toString();
+    }
+
     private static String columnInfoListToStr(List<Map> columnInfoList) {
         StringBuilder sb = new StringBuilder();
         for (Map columnInfo : columnInfoList) {
-            sb.append(String.format("    %sprivate %s %s;\n",
+            sb.append(String.format("    %s%sprivate %s %s;\n",
                     conmentStr(columnInfo.get("COLUMN_COMMENT")),
+                    addTableId(columnInfo.get("JAVA_COLUMN_NAME")),
                     columnInfo.get("JAVA_DATA_TYPE").toString(),
                     columnInfo.get("JAVA_COLUMN_NAME")));
         }
 
+        /**
+         *     public void setId(Integer id) {
+         *         this.id = id;
+         *     }
+         *
+         *     public Integer getId() {
+         *         return this.id;
+         *     }
+         */
         if (!useLombok) {
-            /**
-             *     public void setId(Integer id) {
-             *         this.id = id;
-             *     }
-             *
-             *     public Integer getId() {
-             *         return this.id;
-             *     }
-             */
             for (Map columnInfo : columnInfoList) {
                 String javaColumnName = columnInfo.get("JAVA_COLUMN_NAME").toString();
                 String javaDataType = columnInfo.get("JAVA_DATA_TYPE").toString();
@@ -533,10 +608,22 @@ public class MyCodeGenerator {
         return sb.toString();
     }
 
+    private static Object addTableId(Object javaColumnName) {
+        if (javaColumnName.equals(primaryJavaName) && useMybatisPlus) {
+            return "@TableId(value = \"" + primaryKey + "\", type = IdType.AUTO)\n    ";
+        }
+        return "";
+    }
+
     private static Object getImport(String columnInfo) {
         StringBuilder sb = new StringBuilder();
         if (useLombok) {
             sb.append("import lombok.Data;\n");
+        }
+        if (useMybatisPlus) {
+            sb.append("import com.baomidou.mybatisplus.annotation.IdType;\n" +
+                    "import com.baomidou.mybatisplus.annotation.TableId;\n" +
+                    "import com.baomidou.mybatisplus.annotation.TableName;\n");
         }
         if (columnInfo.contains("private Date ")) {
             sb.append("import java.util.Date;\n");
@@ -547,13 +634,13 @@ public class MyCodeGenerator {
         return sb.toString();
     }
 
-    private static Object conmentStr(Object column_comment) {
+    private static String conmentStr(Object column_comment) {
         if (column_comment != null && column_comment.toString().length() > 0) {
             return String.format("/**\n" +
                     "     * %s\n" +
                     "     */\n    ", column_comment.toString());
         }
-        return "";
+        return "\n    ";
     }
 
     private static String underlineToCamel(String tableName) {
@@ -567,7 +654,35 @@ public class MyCodeGenerator {
         if (f.exists() && !isOverrideFile) {
             return;
         }
-        writeFile(pathname, getServiceImplDefaultContent());
+        writeFile(pathname, useMybatisPlus ? getServiceImplPlusXmlDefaultContent() : getServiceImplDefaultContent());
+    }
+
+    private static String getServiceImplPlusXmlDefaultContent() {
+        String baseContent = String.format("package $moduleNameInDot.service.impl;\n" +
+                        "\n" +
+                        "import org.springframework.stereotype.Service;\n" +
+                        "import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;\n" +
+                        "import $moduleNameInDot.service.$entityNameService;\n" +
+                        "import $moduleNameInDot.mapper.$entityNameMapper;\n" +
+                        "import $moduleNameInDot.entity.$entityName;\n" +
+                        "\n" +
+                        "/**\n" +
+                        " * @author %s\n" +
+                        " * @since %s\n" +
+                        " */\n" +
+                        "@Service\n" +
+                        "public class $entityNameServiceImpl extends ServiceImpl<$entityNameMapper, $entityName> implements $entityNameService {\n" +
+                        "\n" +
+                        "}\n",
+                author,
+                today()
+        );
+        baseContent = baseContent.replace("$moduleNameInDot", moduleNameInDot);
+        baseContent = baseContent.replace("$entityName", entityName);
+        baseContent = baseContent.replace("$lowerEntityName", lowerFirst(entityName));
+        baseContent = baseContent.replace("$primaryJavaType", primaryJavaType);
+        baseContent = baseContent.replace("$primaryJavaName", primaryJavaName);
+        return baseContent;
     }
 
     private static String getServiceImplDefaultContent() {
@@ -585,14 +700,14 @@ public class MyCodeGenerator {
                         " * @since %s\n" +
                         " */\n" +
                         "@Service\n" +
-                        "public class $entityNameServiceImpl implements $entityNameService{\n" +
+                        "public class $entityNameServiceImpl implements $entityNameService {\n" +
                         "\n" +
                         "    @Autowired\n" +
                         "    private $entityNameMapper $lowerEntityNameMapper;\n" +
                         "\n" +
                         "    @Override\n" +
                         "    public void save($entityName $lowerEntityName) {\n" +
-                        "        $lowerEntityNameMapper.save($lowerEntityName);\n" +
+                        "        $lowerEntityNameMapper.insert($lowerEntityName);\n" +
                         "    }\n" +
                         "\n" +
                         "    @Override\n" +
@@ -611,13 +726,13 @@ public class MyCodeGenerator {
                         "    }\n" +
                         "\n" +
                         "    @Override\n" +
-                        "    public List<$entityName> selectList() {\n" +
+                        "    public List<$entityName> list() {\n" +
                         "        return $lowerEntityNameMapper.selectList();\n" +
                         "    }\n" +
                         "}\n",
                 author,
                 today()
-                );
+        );
         baseContent = baseContent.replace("$moduleNameInDot", moduleNameInDot);
         baseContent = baseContent.replace("$entityName", entityName);
         baseContent = baseContent.replace("$lowerEntityName", lowerFirst(entityName));
@@ -633,7 +748,30 @@ public class MyCodeGenerator {
         if (f.exists() && !isOverrideFile) {
             return;
         }
-        writeFile(pathname, getServiceDefaultContent());
+        writeFile(pathname, useMybatisPlus ? getServicePlusXmlDefaultContent() : getServiceDefaultContent());
+    }
+
+    private static String getServicePlusXmlDefaultContent() {
+        String baseContent = String.format("package $moduleNameInDot.service;\n" +
+                        "\n" +
+                        "import com.baomidou.mybatisplus.extension.service.IService;\n" +
+                        "import $moduleNameInDot.entity.$entityName;\n" +
+                        "/**\n" +
+                        " * @author %s\n" +
+                        " * @since %s\n" +
+                        " */\n" +
+                        "public interface $entityNameService extends IService<$entityName> {\n" +
+                        "\n" +
+                        "}\n",
+                author,
+                today()
+        );
+        baseContent = baseContent.replace("$moduleNameInDot", moduleNameInDot);
+        baseContent = baseContent.replace("$entityName", entityName);
+        baseContent = baseContent.replace("$lowerEntityName", lowerFirst(entityName));
+        baseContent = baseContent.replace("$primaryJavaType", primaryJavaType);
+        baseContent = baseContent.replace("$primaryJavaName", primaryJavaName);
+        return baseContent;
     }
 
     private static String getServiceDefaultContent() {
@@ -655,7 +793,7 @@ public class MyCodeGenerator {
                         "\n" +
                         "    $entityName selectById($primaryJavaType $primaryJavaName);\n" +
                         "\n" +
-                        "    List<$entityName> selectList();\n" +
+                        "    List<$entityName> list();\n" +
                         "}\n",
                 author,
                 today()
@@ -679,36 +817,48 @@ public class MyCodeGenerator {
     }
 
     private static String getControllerDefaultContent() {
-        String baseContent = String.format("package %s.controller;\n" +
+        String baseContent = String.format("package $moduleNameInDot.controller;\n" +
                         "\n" +
-                        "import %s.service.%sService;\n" +
+                        "import $moduleNameInDot.entity.$entityName;\n" +
+                        "import $moduleNameInDot.service.$entityNameService;\n" +
                         "import org.springframework.beans.factory.annotation.Autowired;\n" +
-                        "import org.springframework.web.bind.annotation.RequestMapping;\n" +
-                        "import org.springframework.web.bind.annotation.RestController;\n" +
+                        "import org.springframework.web.bind.annotation.*;\n" +
+                        "import java.util.List;\n" +
                         "\n" +
                         "/**\n" +
                         " * @author %s\n" +
                         " * @since %s\n" +
                         " */\n" +
                         "@RestController\n" +
-                        "@RequestMapping(\"/%s/%s/v1\")\n" +
-                        "public class %sController {\n" +
+                        "@RequestMapping(\"/%s/$lowerEntityName/v1\")\n" +
+                        "public class $entityNameController {\n" +
                         "\n" +
                         "    @Autowired\n" +
-                        "    private %sService %sService;\n" +
+                        "    private $entityNameService $lowerEntityNameService;\n" +
+                        "\n" +
+                        "    @PostMapping(\"/save\")\n" +
+                        "    public Object save(@RequestBody $entityName $lowerEntityName) {\n" +
+                        "        $lowerEntityNameService.save($lowerEntityName);\n" +
+                        "        return \"ok\";\n" +
+                        "    }\n" +
+                        "\n" +
+                        "    @GetMapping(\"/list\")\n" +
+                        "    public Object list() {\n" +
+                        "        List<$entityName> list = $lowerEntityNameService.list(%s);\n" +
+                        "        return list;\n" +
+                        "    }\n" +
                         "\n" +
                         "}\n",
-                moduleNameInDot,
-                moduleNameInDot,
-                entityName,
                 author,
                 today(),
                 moduleName.replaceFirst(".+\\\\(\\w+)", "$1"),
-                lowerFirst(entityName),
-                entityName,
-                entityName,
-                lowerFirst(entityName)
+                useMybatisPlus ? "null" : ""
         );
+        baseContent = baseContent.replace("$moduleNameInDot", moduleNameInDot);
+        baseContent = baseContent.replace("$entityName", entityName);
+        baseContent = baseContent.replace("$lowerEntityName", lowerFirst(entityName));
+        baseContent = baseContent.replace("$primaryJavaType", primaryJavaType);
+        baseContent = baseContent.replace("$primaryJavaName", primaryJavaName);
         return baseContent;
     }
 
