@@ -44,14 +44,14 @@ public class MyCodeGenerator {
     //库名
     private static final String dbName = "camapa";
     //表名
-    private static final String tableName = "exp_msg_record";
+    private static final String tableName = "exp_produce_msg";
 
     //数据库账号
     private static final String username = "root";
     //数据库密码
     private static final String password = "123456";
     //数据库url
-    private static final String url = "jdbc:mysql://localhost:3306/" + dbName + "?useUnicode=true&useSSL=false&characterEncoding=utf8";
+    private static final String url = "jdbc:mysql://10.101.11.91:11000/" + dbName + "?useUnicode=true&useSSL=false&characterEncoding=utf8";
 
     //生成路径为： mainPath + moduleName 下的 controller/service/mapper
     private static final String mainPath = "D:\\devcode\\gitcode\\latest\\gitee-local\\code\\camapa\\src\\main";
@@ -556,7 +556,7 @@ public class MyCodeGenerator {
     private static String entityColumnConstant() {
         StringBuilder sb = new StringBuilder();
         for (Map columnInfo : columnInfoList) {
-            sb.append(String.format("    private static final String %s = \"%s\";\n\n",
+            sb.append(String.format("    public static final String %s = \"%s\";\n\n",
                     columnInfo.get("COLUMN_NAME").toString().toUpperCase(),
                     columnInfo.get("COLUMN_NAME")));
         }
