@@ -31,7 +31,7 @@
     <properties>
         <java.version>1.8</java.version>
         <lombok.version>1.18.2</lombok.version>
-        <hutool.version>4.5.18</hutool.version>
+        <hutool.version>5.7.19</hutool.version>
         <fastjson.version>1.2.54</fastjson.version>
         <mybatis-plus.version>3.0.5</mybatis-plus.version>
         <velocity.version>1.7</velocity.version>
